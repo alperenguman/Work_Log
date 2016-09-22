@@ -27,5 +27,7 @@ import display
 
 if __name__ == '__main__':
     display1 = display.Display()
-    print(display1.os)
-    add = fileoperation.Add
+
+    display1.browse_display()
+
+
