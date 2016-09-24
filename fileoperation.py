@@ -15,7 +15,6 @@ class FileOperation:
         else:
             self.csvfile_name = 'worklog.csv'
 
-        self.csvfile_name = 'worklog.csv'
         self.csvfile_mode = 'a+'
         self.csvfile = open(self.csvfile_name, mode=self.csvfile_mode, newline='')
 
@@ -54,3 +53,12 @@ class Edit(FileOperation):
 
 class Delete(FileOperation):
     pass
+
+
+class Browse(FileOperation):
+    def __init__(self):
+        display.Display.clear()
+        FileOperation.__init__(self)
+        self.csvfile_mode = 'r'
+        self.csvfile = open(self.csvfile_name, mode=self.csvfile_mode, newline='')
+        self.reader = csv.DictReader(self.csvfile)

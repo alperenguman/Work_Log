@@ -33,6 +33,7 @@ class Display:
             add = fileoperation.Add()
             self.clear()
             print(self.timestamp_now()+"\n")
+            print(add.csvfile_name)
             temp_dict = {}
             for field in add.fieldnames:
                 if field == 'Entry Time':
@@ -40,6 +41,8 @@ class Display:
                 else:
                     value = input("{}: ".format(field))
                     temp_dict[field] = value
+            print(temp_dict)
+            print(add.writer)
             add.entry(**temp_dict)
 
         elif response.lower() == 'b':
@@ -50,21 +53,21 @@ class Display:
 
     def browse_display(self):
 
-        add = fileoperation.Add()
+        browse = fileoperation.Browse()
         print(' '+"_"*96)
-        heading = (' '*5+'|'+' '*5).join(add.fieldnames)
+        heading = (' '*5+'|'+' '*5).join(browse.fieldnames)
         print('|'+'\033[0;41m'+' '*5+heading+' '*5+'\033[0m'+'|')
         print(' '+"=" * 96)
-        path = os.path.dirname(__file__)
-        with open(path + '/worklog.csv', mode='r') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                n = 0
-                for value in add.fieldnames:
-                    print(' '*2 + row[value]+' '*10, end='')
+        heading_width = []
+        for name in browse.fieldnames:
+            heading_width.append(len(name)+11)
+        for row in browse.reader:
+            n = 0
+            for value in browse.fieldnames:
+                print(' '*2 + row[value]+' '*(16-(len(row[value]))), end='')
 
-                    if n % 4 == 0 and n != 0:
-                        print('\n', end='')
-                    n += 1
+                if n % 4 == 0 and n != 0:
+                    print('\n', end='')
+                n += 1
 
 
