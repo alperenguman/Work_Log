@@ -54,17 +54,20 @@ class Display:
     def browse_display(self):
 
         browse = fileoperation.Browse()
-        print(' '+"_"*96)
+        print('  '+"_"*96)
         heading = (' '*5+'|'+' '*5).join(browse.fieldnames)
+        print(" ", end='')
         print('|'+'\033[0;41m'+' '*5+heading+' '*5+'\033[0m'+'|')
-        print(' '+"=" * 96)
+        print('  '+"=" * 96)
         heading_width = []
         for name in browse.fieldnames:
             heading_width.append(len(name)+11)
         for row in browse.reader:
             n = 0
             for value in browse.fieldnames:
-                print(' '*2 + row[value]+' '*(16-(len(row[value]))), end='')
+                if value == browse.fieldnames[0]:
+                    print(' '*2, end='')
+                print(row[value]+' '*((10+len(value))-(len(row[value])))+'|', end='')
 
                 if n % 4 == 0 and n != 0:
                     print('\n', end='')
