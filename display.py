@@ -57,8 +57,8 @@ class Display:
         print('  '+"_"*96)
         heading = (' '*5+'|'+' '*5).join(browse.fieldnames)
         print(" ", end='')
-        print('|'+'\033[0;41m'+' '*5+heading+' '*5+'\033[0m'+'|')
-        print('  '+"=" * 96)
+        print('|'+'\033[1;37;41m'+' '*5+heading+' '*5+'\033[0m'+'|')
+        print(' ' * 2 + "\033[1;37;40m" + '=' * 96 + "\033[0m")
         heading_width = []
         for name in browse.fieldnames:
             heading_width.append(len(name)+11)
@@ -66,10 +66,11 @@ class Display:
             n = 0
             for value in browse.fieldnames:
                 if value == browse.fieldnames[0]:
-                    print(' '*2, end='')
-                print(row[value]+' '*((10+len(value))-(len(row[value])))+'|', end='')
+                    print(' '+"\033[1;37;40m"+'|'+"\033[0m", end='')
+                print("\033[0;32;40m"+row[value]+"\033[0m"+' '*((10+len(value))-(len(row[value]))) +
+                      "\033[1;37;40m"+'|'+"\033[0m", end='')
 
-                if n % 4 == 0 and n != 0:
+                if n % (len(browse.fieldnames)-1) == 0 and n != 0:
                     print('\n', end='')
                 n += 1
 
