@@ -57,7 +57,6 @@ class Delete(FileOperation):
 
 class Browse(FileOperation):
     def __init__(self):
-        display.Display.clear()
         FileOperation.__init__(self)
         self.csvfile_mode = 'r'
         self.csvfile = open(self.csvfile_name, mode=self.csvfile_mode, newline='')
