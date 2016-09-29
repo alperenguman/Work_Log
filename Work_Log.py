@@ -34,4 +34,3 @@ if __name__ == '__main__':
     display1.add_or_browse()
     display1.browse_display()
     nav1 = navigate.NavigateBrowse(display1)
-    nav2 = navigate.NavigateEntry(display1)

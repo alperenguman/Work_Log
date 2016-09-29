@@ -1,6 +1,7 @@
 import msvcrt
 import time
 
+import fileoperation
 
 class NavigateBrowse:
 
@@ -11,6 +12,7 @@ class NavigateBrowse:
     def on_enter(self):
         self.display.browse_display()
         self.display.full_display()
+        nav2 = NavigateEntry(self.display)
 
     def key_capture(self):
         while True:
@@ -39,8 +41,13 @@ class NavigateEntry:
         self.key_capture()
 
     def on_enter(self):
+
+        add1 = fileoperation.Add()
+
         self.display.browse_display()
-        self.display.full_display()
+        self.display.edit_display()
+        fileoperation.Edit(self.display.browse_row, add1.fieldnames[self.display.entry_row], "bok")
+
 
     def key_capture(self):
         while True:
@@ -56,7 +63,9 @@ class NavigateEntry:
                 if key == 80:  # Down arrow
                     self.display.entry_row += 1
                     self.display.browse_display()
+                    self.display.full_display()
                 elif key == 72:  # Up arrow
                     self.display.entry_row -= 1
                     self.display.browse_display()
+                    self.display.full_display()
             time.sleep(.2)

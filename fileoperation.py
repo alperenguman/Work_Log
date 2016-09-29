@@ -26,7 +26,6 @@ class FileOperation:
 class Add(FileOperation):
 
     def __init__(self):
-        display.Display.clear()
         FileOperation.__init__(self)
 
         l = []
@@ -48,7 +47,25 @@ class Add(FileOperation):
 
 
 class Edit(FileOperation):
-    pass
+
+    def __init__(self, entry_no, field, value):
+        FileOperation.__init__(self)
+        self.entry(entry_no, field, value)
+
+    def entry(self, entry, field, value):
+        self.csvfile_mode = 'r'
+        self.csvfile = open(self.csvfile_name, mode=self.csvfile_mode, newline='')
+        self.reader = csv.DictReader(self.csvfile, fieldnames=self.fieldnames)
+        temp_list = []
+        for row in self.reader:
+            temp_list.append(row)
+        temp_list[entry][field] = value
+        self.csvfile_mode = 'w'
+        self.csvfile = open(self.csvfile_name, mode=self.csvfile_mode, newline='')
+        self.writer = csv.DictWriter(self.csvfile, fieldnames=self.fieldnames)
+        for row in temp_list:
+            self.writer.writerow(row)
+
 
 
 class Delete(FileOperation):
