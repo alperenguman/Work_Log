@@ -16,6 +16,7 @@ class Display:
         self.browse_row = 0
         self.entry_row = 0
 
+
     @staticmethod
     def clear():
         if sys.platform == 'win32':
@@ -101,7 +102,13 @@ class Display:
         print("\n" + " "*4 + "Use arrow keys to navigate, ENTER to select,"
                              " S to bring up search and ESC to quit browsing.")
 
-    def full_display(self):
+    def full_display(self, *args):
+
+        try:
+            hl_color = str(args[0])
+        except IndexError:
+            hl_color = str(41)
+
         browse = fileoperation.Browse()
         entries_list = []
         display_list = []
@@ -110,7 +117,7 @@ class Display:
         m = 0
         for title in browse.fieldnames:
             if m == self.entry_row:
-                display_list.append(' '*2 + title + ': ' + "\033[0;32;41m" +
+                display_list.append(' '*2 + title + ': ' + "\033[0;32;"+hl_color+"m" +
                                     entries_list[self.browse_row][title] + "\033[0m" + '\n')
             else:
                 display_list.append(' ' * 2 + title + ': ' + "\033[0;32;40m" +
@@ -118,21 +125,3 @@ class Display:
             m += 1
         a = ''.join(display_list)
         print('\n\n' + a)
-
-    def edit_display(self):
-
-        browse = fileoperation.Browse()
-        entries_list = []
-        display_list = []
-        for row in browse.reader:
-            entries_list.append(row)
-        m = 0
-        for title in browse.fieldnames:
-            if m == self.entry_row:
-                display_list.append(' ' * 2 + title + ': ' + "\033[0;32;41m" +
-                                    "\033[0m" + '\n')
-            else:
-                display_list.append(' ' * 2 + title + ': ' + "\033[0;32;40m" +
-                                    entries_list[self.browse_row][title] + "\033[0m" + '\n')
-            m += 1
-        a = ''.join(display_list)

@@ -11,8 +11,6 @@ import fileoperation
 import display
 import navigate
 
-# Add a new entry or lookup previous entries
-
 
 # If looking up previous entries:
     # Navigate through results of search
@@ -26,7 +24,6 @@ import navigate
     # find by pattern
         # Regex input task name or notes
 
-# Delete or Edit entries
 # Quit the script from menu
 
 if __name__ == '__main__':
