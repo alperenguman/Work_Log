@@ -1,9 +1,8 @@
 import msvcrt
 import time
+import threading
 
 import fileoperation
-
-class NavigateMain:
 
 class NavigateBrowse:
 
@@ -18,6 +17,37 @@ class NavigateBrowse:
         self.display.full_display()
         nav2 = NavigateEntry(self.display)
 
+    def search(self):
+        type_or_input = 0
+        key = ord(msvcrt.getch())
+        if key == 27:  # ESC
+            return "stop"
+
+        elif key == 224:
+            key = ord(msvcrt.getch())
+
+            if type_or_input == 0 and self.display.search_select != 0 and key == 72:  # Up arrow
+                self.display.browse_display()
+                self.display.search_select -= 1
+                self.display.search_display(type_or_input)
+
+            elif type_or_input == 0 and self.display.search_select < len(self.display.search_types)-1 and \
+                    key == 80:  # Down arrow
+
+                self.display.search_select += 1
+                self.display.browse_display()
+                self.display.search_display(type_or_input)
+
+            elif key == 75:
+                type_or_input = 0
+                self.display.browse_display()
+                self.display.search_display(type_or_input)
+
+            elif key == 77:
+                type_or_input = 1
+                self.display.browse_display()
+                self.display.search_display(type_or_input)
+
     def key_capture(self):
 
         while True:
@@ -28,8 +58,13 @@ class NavigateBrowse:
             elif key == 13:  # Enter
                 self.on_enter()
 
-            elif key == 13:  # Enter
-                self.on_enter()
+            elif key == 115:  # S
+                self.display.browse_display()
+                self.display.search_display(0)
+                while True:
+                    if self.search() == "stop":
+                        self.display.browse_display()
+                        break
 
             elif key == 224:  # Special keys (arrows, f keys, ins, del, etc.)
                 key = ord(msvcrt.getch())
@@ -43,13 +78,13 @@ class NavigateBrowse:
                     print(self.display.browse_row)
 
                 elif key == 83:  # Del
-                    response = input("\n\n  Are you sure you want to delete this entry?\n"
-                                     "  [Y]es or any other key for no:  ")
-                    if response.lower() == 'y':
-                        fileoperation.Delete(self.display.browse_row+1)
                     self.display.browse_display()
-
-
+                    print("\n\n  Are you sure you want to delete this entry?\n"
+                          "  [Y]es or any other key for no:  ", end='')
+                    key = ord(msvcrt.getch())
+                    if key == 121:
+                        fileoperation.Delete(self.display.browse_row + 1)
+                    self.display.browse_display()
             time.sleep(.2)
 
 

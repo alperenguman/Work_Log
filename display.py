@@ -15,7 +15,8 @@ class Display:
     def __init__(self):
         self.browse_row = 0
         self.entry_row = 0
-
+        self.search_select = 0
+        self.search_types = ["date", "exact string", "time spent", "pattern"]
 
     @staticmethod
     def clear():
@@ -125,3 +126,24 @@ class Display:
             m += 1
         a = ''.join(display_list)
         print('\n\n' + a)
+
+    def search_display(self, *args):
+        try:
+            if args[0] == 0:
+                print("\n\n" + " " * 62 + "^")
+                print(" " * 50 + "Search by " + "\033[0;37;41m" + self.search_types[self.search_select] +
+                      "\033[0m" + ":  " + "|______________________________|")
+                print(" " * 62 + "v")
+            elif args[0] == 1:
+                print("\n\n\n" + " " * 50 + "Search by " + self.search_types[self.search_select] + ":  " +
+                      "|" + "\033[0;37;41m" + "______________________________" + "\033[0m" + "|")
+                try:
+                    temp_list = []
+                    temp_list.append(args[1])
+                    string = ''.join(temp_list)
+                    print("\n\n\n" + " " * 50 + "Search by " + self.search_types[self.search_select] + ":  " +
+                          "|" + "\033[4;37;41m" + string + "_"*(30-len(string)) + + "\033[0m" + "|")
+                except IndexError:
+                    pass
+        except IndexError:
+            pass
