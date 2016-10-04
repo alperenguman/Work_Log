@@ -20,6 +20,7 @@ class NavigateBrowse:
     def search(self):
         type_or_input = 0
         key = ord(msvcrt.getch())
+
         if key == 27:  # ESC
             return "stop"
 
@@ -38,15 +39,35 @@ class NavigateBrowse:
                 self.display.browse_display()
                 self.display.search_display(type_or_input)
 
-            elif key == 75:
+            elif key == 75:  # Left arrow
                 type_or_input = 0
                 self.display.browse_display()
                 self.display.search_display(type_or_input)
 
-            elif key == 77:
+            elif key == 77:  # Right arrow
                 type_or_input = 1
                 self.display.browse_display()
                 self.display.search_display(type_or_input)
+                typed_string_list = []
+                while type_or_input == 1:
+                    key = ord(msvcrt.getch())
+                    if key == 27:  # ESC
+                        return "stop"
+                    elif key == 224:
+                        key = ord(msvcrt.getch())
+                        if key == 75:  # left arrow
+                            type_or_input = 0
+                            self.display.browse_display()
+                            self.display.search_display(type_or_input)
+                    if key == 13:  # Enter
+                        pass
+                    if key == 8:  # backspace
+                        self.display.browse_display()
+                        self.display.search_display(type_or_input, "backspace")
+                    else:
+                        char = chr(key)
+                        self.display.browse_display()
+                        self.display.search_display(type_or_input, char)
 
     def key_capture(self):
 

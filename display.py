@@ -17,6 +17,7 @@ class Display:
         self.entry_row = 0
         self.search_select = 0
         self.search_types = ["date", "exact string", "time spent", "pattern"]
+        self.search_input = []
 
     @staticmethod
     def clear():
@@ -100,8 +101,8 @@ class Display:
                         print('\n', end='')
                     n += 1
                 m += 1
-        print("\n" + " "*4 + "Use arrow keys to navigate, ENTER to select,"
-                             " S to bring up search and ESC to quit browsing.")
+        print("\n" + " "*15 + "Use arrow keys to navigate, ENTER to select, DEL to delete entry,\n"
+              + " "*24 + "S to bring up search and ESC to quit browsing.")
 
     def full_display(self, *args):
 
@@ -130,20 +131,30 @@ class Display:
     def search_display(self, *args):
         try:
             if args[0] == 0:
-                print("\n\n" + " " * 62 + "^")
-                print(" " * 50 + "Search by " + "\033[0;37;41m" + self.search_types[self.search_select] +
-                      "\033[0m" + ":  " + "|______________________________|")
-                print(" " * 62 + "v")
+                string = ''.join(self.search_input)
+                print("\n\n" + " " * 52 + "^")
+                print(" " * 40 + "Search by " + "\033[0;32;41m" + self.search_types[self.search_select] +
+                      "\033[0m" + ":  " + "|" + "\033[4;37;40m" + string +
+                      "_"*(44-len(self.search_types[self.search_select])-len(string)) + "\033[0m" + "|")
+                print(" " * 52 + "v")
             elif args[0] == 1:
-                print("\n\n\n" + " " * 50 + "Search by " + self.search_types[self.search_select] + ":  " +
-                      "|" + "\033[0;37;41m" + "______________________________" + "\033[0m" + "|")
                 try:
-                    temp_list = []
-                    temp_list.append(args[1])
-                    string = ''.join(temp_list)
-                    print("\n\n\n" + " " * 50 + "Search by " + self.search_types[self.search_select] + ":  " +
-                          "|" + "\033[4;37;41m" + string + "_"*(30-len(string)) + + "\033[0m" + "|")
+                    if args[1] == "backspace":
+                        self.search_input.pop()
+                    else:
+                        self.search_input.append(args[1])
+                    string = ''.join(self.search_input)
+                    print("\n\n\n" + " " * 40 + "Search by " + "\033[0;32;40m" +
+                          self.search_types[self.search_select] + "\033[0m" + ":  " +
+                          "|" + "\033[4;37;41m" + string + "_"*(44-len(self.search_types[self.search_select])-len(string))
+                          + "\033[0m" + "|")
                 except IndexError:
-                    pass
+                    string = ''.join(self.search_input)
+                    print("\n\n\n" + " " * 40 + "Search by " + "\033[0;32;40m" +
+                          self.search_types[self.search_select] + "\033[0m" + ":  " +
+                          "|" + "\033[4;37;41m" + string + "_" * (
+                          44 - len(self.search_types[self.search_select]) - len(string))
+                          + "\033[0m" + "|")
+
         except IndexError:
             pass
