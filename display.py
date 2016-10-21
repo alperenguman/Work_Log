@@ -43,14 +43,23 @@ class Display:
         if response.lower() == 'a':
             add = fileoperation.Add()
             self.clear()
-            print(self.timestamp_now()+"\n")
-            print(add.csvfile_name)
+            print("\n")
+            print(" "*2+self.timestamp_now()+"\n\n")
             temp_dict = {}
             for field in add.fieldnames:
                 if field == 'Entry Time':
                     temp_dict[field] = self.timestamp_now()
+                elif field == 'Date':
+                    print("  " + "Please enter the" + "\033[1;32;40m" + " date " + "\033[0m" +
+                          "in MM-DD-YYYY format.\n\n"
+
+                          "  Please enter the" + "\033[1;32;40m" + " duration " + "\033[0m"
+                          "in 5 mins/hours/days etc. format\n"
+                          "  Alternatively, you can specify the time range i.e. 5:06pm - 6:07am")
+                    value = input("\n" + " "*2 + "{}: ".format(field))
+                    temp_dict[field] = value
                 else:
-                    value = input("{}: ".format(field))
+                    value = input(" " * 2 + "{}: ".format(field))
                     temp_dict[field] = value
             print(temp_dict)
             print(add.writer)
@@ -62,8 +71,15 @@ class Display:
             self.clear()
             print("Please press 'A' to add or 'B' to browse")
 
-    def browse_display(self):
+    def browse_display(self, *args):
         self.clear()
+
+        try:
+            dicts_list = args[0]
+
+        except IndexError:
+            pass
+
         browse = fileoperation.Browse()
         print('  '+"_"*96)
         heading = (' '*5+'|'+' '*5).join(browse.fieldnames)
@@ -75,11 +91,13 @@ class Display:
         for name in browse.fieldnames:
             heading_width.append(len(name)+11)
             m = 0
-            for row in browse.reader:
-                n = 0
 
+        try:
+            for row in dicts_list:
+                n = 0
                 if self.browse_row == m:
                     for value in browse.fieldnames:
+
                         if value == browse.fieldnames[0]:
                             print(' ' + "\033[1;37;40m" + '|' + "\033[0m", end='')
                         print("\033[0;32;41m" + row[value] + ' ' * ((10 + len(value)) - (len(row[value]))) + "\033[0m" +
@@ -101,6 +119,36 @@ class Display:
                         print('\n', end='')
                     n += 1
                 m += 1
+
+        except UnboundLocalError:
+            for row in browse.reader:
+                n = 0
+
+                if self.browse_row == m:
+                    for value in browse.fieldnames:
+
+                        if value == browse.fieldnames[0]:
+                            print(' ' + "\033[1;37;40m" + '|' + "\033[0m", end='')
+                        print("\033[0;32;41m" + row[value] + ' ' * ((10 + len(value)) - (len(row[value]))) + "\033[0m" +
+                              "\033[1;37;40m" + '|' + "\033[0m", end='')
+                        if n % (len(browse.fieldnames) - 1) == 0 and n != 0:
+                            print('\n', end='')
+                        n += 1
+                    m += 1
+                    continue
+
+                for value in browse.fieldnames:
+
+                    if value == browse.fieldnames[0]:
+                        print(' ' + "\033[1;37;40m" + '|' + "\033[0m", end='')
+                    print("\033[0;32;40m" + row[value] + "\033[0m" + ' ' * ((10 + len(value)) - (len(row[value]))) +
+                          "\033[1;37;40m" + '|' + "\033[0m", end='')
+
+                    if n % (len(browse.fieldnames)-1) == 0 and n != 0:
+                        print('\n', end='')
+                    n += 1
+                m += 1
+
         print("\n" + " "*15 + "Use arrow keys to navigate, ENTER to select, DEL to delete entry,\n"
               + " "*24 + "S to bring up search and ESC to quit browsing.")
 
@@ -146,7 +194,8 @@ class Display:
                     string = ''.join(self.search_input)
                     print("\n\n\n" + " " * 40 + "Search by " + "\033[0;32;40m" +
                           self.search_types[self.search_select] + "\033[0m" + ":  " +
-                          "|" + "\033[4;37;41m" + string + "_"*(44-len(self.search_types[self.search_select])-len(string))
+                          "|" + "\033[4;37;41m" + string +
+                          "_"*(44-len(self.search_types[self.search_select])-len(string))
                           + "\033[0m" + "|")
                 except IndexError:
                     string = ''.join(self.search_input)

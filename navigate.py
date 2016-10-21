@@ -3,6 +3,8 @@ import time
 import threading
 
 import fileoperation
+import search
+
 
 class NavigateBrowse:
 
@@ -10,6 +12,9 @@ class NavigateBrowse:
         self.file = fileoperation.Browse()
         self.total_entries = self.file.get_total_entries()
         self.display = display
+        self.search_q = []
+        self.search_result = []
+        self.search_instance = search.Search()
         self.key_capture()
 
     def on_enter(self):
@@ -18,7 +23,7 @@ class NavigateBrowse:
         nav2 = NavigateEntry(self.display)
 
     def search(self):
-        type_or_input = 0
+        type_or_input = 0  # type_or_input is a boolean that determines if search by or search input is selected.
         key = ord(msvcrt.getch())
 
         if key == 27:  # ESC
@@ -34,7 +39,6 @@ class NavigateBrowse:
 
             elif type_or_input == 0 and self.display.search_select < len(self.display.search_types)-1 and \
                     key == 80:  # Down arrow
-
                 self.display.search_select += 1
                 self.display.browse_display()
                 self.display.search_display(type_or_input)
@@ -46,10 +50,22 @@ class NavigateBrowse:
 
             elif key == 77:  # Right arrow
                 type_or_input = 1
-                self.display.browse_display()
-                self.display.search_display(type_or_input)
-                typed_string_list = []
-                while type_or_input == 1:
+
+                if len(self.search_q) == 0:
+                    self.display.browse_display()
+                    self.display.search_display(type_or_input)
+
+                elif len(self.search_q) > 0 and self.display.search_select == 1:  # A query is present and search
+                                                                                    # by exact string is selected.
+                    self.search_result = self.search_instance.exact_string(''.join(self.search_q))
+                    self.display.browse_display(self.search_result)
+                    self.display.search_display(type_or_input)
+
+                else:
+                    self.display.browse_display()
+                    self.display.search_display(type_or_input)
+
+                while type_or_input == 1:  # This is the part where search input is being received.
                     key = ord(msvcrt.getch())
                     if key == 27:  # ESC
                         return "stop"
@@ -59,17 +75,38 @@ class NavigateBrowse:
                             type_or_input = 0
                             self.display.browse_display()
                             self.display.search_display(type_or_input)
+                            break
                     if key == 13:  # Enter
                         pass
                     if key == 8:  # backspace
-                        self.display.browse_display()
-                        self.display.search_display(type_or_input, "backspace")
-                    else:
-                        char = chr(key)
-                        self.display.browse_display()
-                        self.display.search_display(type_or_input, char)
+                        if len(self.search_q) > 1:
+                            self.search_q.pop()
+                            if self.display.search_select == 1:  # Search by exact string
+                                self.search_result = self.search_instance.exact_string(''.join(self.search_q))
 
-    def key_capture(self):
+                            self.display.browse_display(self.search_result)
+                            self.display.search_display(type_or_input, "backspace")
+
+                        elif len(self.search_q) == 1:
+                            self.search_q.pop()
+                            self.display.browse_display()
+                            self.display.search_display(type_or_input, "backspace")
+
+                        elif len(self.search_q) == 0:
+                            self.display.browse_display()
+                            self.display.search_display(type_or_input)
+
+                    else:  # Alphanumeric search entry
+                        char = chr(key)  # convert key number to actual string
+                        self.search_q.append(char)
+                        if self.display.search_select == 1:
+                            self.search_result = self.search_instance.exact_string(''.join(self.search_q))
+                            self.display.browse_display(self.search_result)
+                        else:
+                            self.display.browse_display()
+                        self.display.search_display(type_or_input, char)  # submit the string character to display
+
+    def key_capture(self):  # Main capture routine that runs and calls on_enter and search sub-routines.
 
         while True:
             key = ord(msvcrt.getch())

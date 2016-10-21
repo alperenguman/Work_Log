@@ -43,8 +43,18 @@ class Add(FileOperation):
     def entry(self, **kwargs):
         temp_dict = {}
         for key, value in kwargs.items():
+            if key == 'Date':
+                self.datecheck(value)
+            elif key == 'Duration':
+                self.durationcheck()
             temp_dict[key] = value
         self.writer.writerow(temp_dict)
+
+    def datecheck(self, value):
+        pass
+
+    def durationcheck(self):
+        pass
 
 
 class Edit(FileOperation):
@@ -102,3 +112,10 @@ class Browse(FileOperation):
             csvitems.append(row)
         self.total_entries = len(csvitems)
         return self.total_entries
+
+    def get_data(self):
+        temp_list = []
+        for row in self.reader:
+            temp_list.append(row)
+        return temp_list
+
