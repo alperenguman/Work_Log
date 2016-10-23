@@ -15,7 +15,7 @@ class NavigateBrowse:
         self.search_q = []
         self.search_result = []
         self.search_instance = search.Search()
-        self.key_capture()
+        self.main_capture()
 
     def on_enter(self):
         self.display.browse_display()
@@ -55,8 +55,14 @@ class NavigateBrowse:
                     self.display.browse_display()
                     self.display.search_display(type_or_input)
 
+                elif len(self.search_q) > 0 and self.display.search_select == 0:  # A query is present and search
+                                                                                    # by DATE is selected.
+                    self.search_result = self.search_instance.by_date(''.join(self.search_q))
+                    self.display.browse_display(self.search_result)
+                    self.display.search_display(type_or_input)
+
                 elif len(self.search_q) > 0 and self.display.search_select == 1:  # A query is present and search
-                                                                                    # by exact string is selected.
+                                                                                    # by EXACT STRING is selected.
                     self.search_result = self.search_instance.exact_string(''.join(self.search_q))
                     self.display.browse_display(self.search_result)
                     self.display.search_display(type_or_input)
@@ -106,8 +112,25 @@ class NavigateBrowse:
                             self.display.browse_display()
                         self.display.search_display(type_or_input, char)  # submit the string character to display
 
-    def key_capture(self):  # Main capture routine that runs and calls on_enter and search sub-routines.
+    def main_capture(self):
+        m = 0
+        self.display.add_or_browse()
+        while True:
+            key = ord(msvcrt.getch())
+            if key == 27:  # ESC
+                if m == 0:
+                    m += 1
+                    print("Press Q to quit.")
 
+            elif key == 13:  # Enter
+                self.browse_capture()
+
+            elif key == 113:  # Q
+                print("Goodbye!")
+                break
+
+    def browse_capture(self):  # Main capture routine that runs and calls on_enter and search sub-routines.
+        self.display.browse_display()
         while True:
             key = ord(msvcrt.getch())
             if key == 27:  # ESC
@@ -127,13 +150,14 @@ class NavigateBrowse:
             elif key == 224:  # Special keys (arrows, f keys, ins, del, etc.)
                 key = ord(msvcrt.getch())
                 if key == 80 and self.display.browse_row != self.total_entries-1:  # Down arrow
-                    self.display.browse_row += 1
-                    self.display.browse_display()
-                    print(self.display.browse_row)
+                    if self.display.browse_row != self.file.get_total_entries()-1:
+                        self.display.browse_row += 1
+                        self.display.browse_display()
+
                 elif key == 72 and self.display.browse_row != 0:  # Up arrow
-                    self.display.browse_row -= 1
-                    self.display.browse_display()
-                    print(self.display.browse_row)
+                    if self.display.browse_row != 0:
+                        self.display.browse_row -= 1
+                        self.display.browse_display()
 
                 elif key == 83:  # Del
                     self.display.browse_display()
@@ -141,7 +165,7 @@ class NavigateBrowse:
                           "  [Y]es or any other key for no:  ", end='')
                     key = ord(msvcrt.getch())
                     if key == 121:
-                        fileoperation.Delete(self.display.browse_row + 1)
+                        fileoperation.Delete(self.display.browse_row)
                     self.display.browse_display()
             time.sleep(.2)
 

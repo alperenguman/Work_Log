@@ -1,4 +1,6 @@
 import re
+import datetime
+
 import fileoperation
 
 
@@ -20,3 +22,17 @@ class Search:
 
         return dicts_list
 
+    def by_date(self, query):
+
+        format1 = "%m/%d/%Y"
+
+        try:
+            queried_datetime = datetime.datetime.strptime(query, format1)
+        except ValueError:
+            return "incorrect format"
+
+        dicts_list = []
+        for dicts in self.data:
+            for key, value in dicts.items():
+                if key == 'Date':
+                    pass

@@ -19,6 +19,7 @@ class Display:
         self.search_types = ["date", "exact string", "time spent", "pattern"]
         self.search_input = []
 
+
     @staticmethod
     def clear():
         if sys.platform == 'win32':
@@ -41,35 +42,71 @@ class Display:
                          "[Q]uit program\n\n"
                          ": ")
         if response.lower() == 'a':
-            add = fileoperation.Add()
-            self.clear()
-            print("\n")
-            print(" "*2+self.timestamp_now()+"\n\n")
-            temp_dict = {}
-            for field in add.fieldnames:
-                if field == 'Entry Time':
-                    temp_dict[field] = self.timestamp_now()
-                elif field == 'Date':
-                    print("  " + "Please enter the" + "\033[1;32;40m" + " date " + "\033[0m" +
-                          "in MM-DD-YYYY format.\n\n"
-
-                          "  Please enter the" + "\033[1;32;40m" + " duration " + "\033[0m"
-                          "in 5 mins/hours/days etc. format\n"
-                          "  Alternatively, you can specify the time range i.e. 5:06pm - 6:07am")
-                    value = input("\n" + " "*2 + "{}: ".format(field))
-                    temp_dict[field] = value
-                else:
-                    value = input(" " * 2 + "{}: ".format(field))
-                    temp_dict[field] = value
-            print(temp_dict)
-            print(add.writer)
-            add.entry(**temp_dict)
-
+            self.add_display()
         elif response.lower() == 'b':
             pass
         else:
             self.clear()
-            print("Please press 'A' to add or 'B' to browse")
+
+    def add_display(self, **kwargs):
+        prompt = ("  " + "Please enter the" + "\033[1;32;40m" + " date " + "\033[0m" +
+                  "in MM/DD/YYYY format.\n\n"
+                  "  Please enter the" + "\033[1;32;40m" + " duration " + "\033[0m"
+                  "in 5 mins/hours/days etc. format\n"
+                  "  Alternatively, you can specify the time range i.e. 5:06pm - 6:07am")
+        for key, value in kwargs.items():
+            setattr(Display, key, value)
+        add = fileoperation.Add()
+        self.clear()
+        print("\n")
+        print(" "*2+self.timestamp_now()+"\n\n")
+        temp_dict = {}
+        for field in add.fieldnames:
+            try:
+                if field == 'Entry Time':
+                    temp_dict[field] = self.timestamp_now()
+                    continue
+                if add.fieldnames.index(field) == 1:
+                    temp_dict[field] = self.value1
+                    print("  " + "\033[1;31;40m" + self.message + "\033[0m" + "\n")
+                    print("  " + field + ": " + self.value1)
+                    continue
+                elif add.fieldnames.index(field) == 2:
+                    temp_dict[field] = self.value2
+                    print("  " + field + ": " + self.value2)
+                    continue
+            except AttributeError:
+                pass
+
+            if field == 'Entry Time':
+                temp_dict[field] = self.timestamp_now()
+
+            elif field == add.fieldnames[1]:
+                try:
+                    print("  " + "\033[1;31;40m" + self.message + "\033[0m")
+                except AttributeError:
+                    print(prompt)
+                value = input("\n" + " "*2 + "{}: ".format(field))
+                if add.datecheck(value) == 'incorrect':
+                    self.clear()
+                    self.add_display(message="Invalid date format, please try MM/DD/YYYY.")
+                    break
+                temp_dict[field] = value
+            elif field == add.fieldnames[3]:
+                value = input(" " * 2 + "{}: ".format(field))
+                if add.durationcheck(value) == 'incorrect':
+                    self.clear()
+                    self.add_display(message="Invalid duration format, please try 5 minutes, 50 years etc.",
+                                     value1=temp_dict[add.fieldnames[1]],
+                                     value2=temp_dict[add.fieldnames[2]])
+                    break
+                temp_dict[field] = value
+
+            else:
+                value = input(" " * 2 + "{}: ".format(field))
+                temp_dict[field] = value
+        if len(temp_dict) == len(add.fieldnames):
+            add.entry(**temp_dict)
 
     def browse_display(self, *args):
         self.clear()
@@ -77,7 +114,7 @@ class Display:
         try:
             dicts_list = args[0]
 
-        except IndexError:
+        except IndexError or UnboundLocalError:
             pass
 
         browse = fileoperation.Browse()
@@ -100,7 +137,8 @@ class Display:
 
                         if value == browse.fieldnames[0]:
                             print(' ' + "\033[1;37;40m" + '|' + "\033[0m", end='')
-                        print("\033[0;32;41m" + row[value] + ' ' * ((10 + len(value)) - (len(row[value]))) + "\033[0m" +
+                        print("\033[0;32;41m" + row[value][0:len(value)+10] + ' ' * ((10 + len(value)) -
+                              (len(row[value]))) + "\033[0m" +
                               "\033[1;37;40m" + '|' + "\033[0m", end='')
                         if n % (len(browse.fieldnames) - 1) == 0 and n != 0:
                             print('\n', end='')
@@ -112,8 +150,8 @@ class Display:
 
                     if value == browse.fieldnames[0]:
                         print(' ' + "\033[1;37;40m" + '|' + "\033[0m", end='')
-                    print("\033[0;32;40m" + row[value] + "\033[0m" + ' ' * ((10 + len(value)) - (len(row[value]))) +
-                          "\033[1;37;40m" + '|' + "\033[0m", end='')
+                    print("\033[0;32;40m" + row[value][0:len(value)+10] + "\033[0m" + ' ' * ((10 + len(value)) -
+                          (len(row[value]))) + "\033[1;37;40m" + '|' + "\033[0m", end='')
 
                     if n % (len(browse.fieldnames)-1) == 0 and n != 0:
                         print('\n', end='')
@@ -129,8 +167,8 @@ class Display:
 
                         if value == browse.fieldnames[0]:
                             print(' ' + "\033[1;37;40m" + '|' + "\033[0m", end='')
-                        print("\033[0;32;41m" + row[value] + ' ' * ((10 + len(value)) - (len(row[value]))) + "\033[0m" +
-                              "\033[1;37;40m" + '|' + "\033[0m", end='')
+                        print("\033[0;32;41m" + row[value][0:len(value)+10] + ' ' * ((10 + len(value)) -
+                              (len(row[value]))) + "\033[0m" + "\033[1;37;40m" + '|' + "\033[0m", end='')
                         if n % (len(browse.fieldnames) - 1) == 0 and n != 0:
                             print('\n', end='')
                         n += 1
@@ -141,13 +179,14 @@ class Display:
 
                     if value == browse.fieldnames[0]:
                         print(' ' + "\033[1;37;40m" + '|' + "\033[0m", end='')
-                    print("\033[0;32;40m" + row[value] + "\033[0m" + ' ' * ((10 + len(value)) - (len(row[value]))) +
-                          "\033[1;37;40m" + '|' + "\033[0m", end='')
+                    print("\033[0;32;40m" + row[value][0:len(value)+10] + "\033[0m" + ' ' * ((10 + len(value)) -
+                          (len(row[value]))) + "\033[1;37;40m" + '|' + "\033[0m", end='')
 
                     if n % (len(browse.fieldnames)-1) == 0 and n != 0:
                         print('\n', end='')
                     n += 1
                 m += 1
+        print(" "*87 + "Page:" + "1" + " Row:" + str(self.browse_row), end='')
 
         print("\n" + " "*15 + "Use arrow keys to navigate, ENTER to select, DEL to delete entry,\n"
               + " "*24 + "S to bring up search and ESC to quit browsing.")

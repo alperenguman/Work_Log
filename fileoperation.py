@@ -4,6 +4,8 @@ import sys
 import datetime
 import pdb
 import msvcrt
+import datetime
+import re
 
 import display
 
@@ -43,18 +45,25 @@ class Add(FileOperation):
     def entry(self, **kwargs):
         temp_dict = {}
         for key, value in kwargs.items():
-            if key == 'Date':
-                self.datecheck(value)
-            elif key == 'Duration':
-                self.durationcheck()
             temp_dict[key] = value
         self.writer.writerow(temp_dict)
 
     def datecheck(self, value):
-        pass
+        format1 = "%m/%d/%Y"
+        try:
+            datetime.datetime.strptime(value, format1)
+        except ValueError:
+            return "incorrect"
 
-    def durationcheck(self):
-        pass
+    def durationcheck(self, value):
+        dregex = re.search(r"""
+                (?P<duration>[\d]+\s?[\w]+[^\d]\b)
+        """, value, re.X | re.I)
+
+        if dregex is None:
+            return "incorrect"
+        else:
+            return dregex.group('duration')
 
 
 class Edit(FileOperation):

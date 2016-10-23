@@ -48,3 +48,4 @@ Temporary Items
 .idea
 *.csv
 __pycache__
+test
